@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import workReducers from "./reducer/workReducers";
+import workerReducers from "./reducer/workerReducers";
 
 const store = configureStore({
     reducer: {
-        works: workReducers,
+        workers: workerReducers,
     },
 });
 

@@ -1,17 +1,17 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import WorkForm from "./components/WorkForm";
-import WorkList from "./components/WorkList";
+import WorkerForm from "./components/WorkerForm"
+import WorkerList from "./components/WorkerList";
 
 function App() {
   return (
     <Router>
       <div className="App">
-        <h1>Quản lý công việc</h1>
+        <h1>Quản lý nhân viên</h1>
         <Routes>
-          <Route path="/" element={<WorkList/>} />
-          <Route path="/add" element={<WorkForm/>} />
-          <Route path="/edit/:id" element={<WorkForm/>} />
+          <Route path="/" element={<WorkerList/>} />
+          <Route path="/add" element={<WorkerForm/>} />
+          <Route path="/edit/:id" element={<WorkerForm/>} />
         </Routes>
       </div>
     </Router>
