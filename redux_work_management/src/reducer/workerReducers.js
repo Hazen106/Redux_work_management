@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 //Khởi tạo
 const initialState = {
     workers: [
-        {id: 1, workername: 'Đỗ Văn Quý', age: 23, address: "Hải Dương", ban: 'Công nghệ thông tin'}
+        {id: 1, workercode: 111111, workername: 'Đỗ Văn Quý', age: 23, address: "Hải Dương", ban: 'Công nghệ thông tin'}
     ],
     nextId: 2,
 };
@@ -27,8 +27,15 @@ const workersSlice = createSlice({
             //Tìm công việc có id trùng với action.payload.id nếu có thì cập nhật dữ liệu từ payload
         },
         deleteworker: (state, action) => {
-             state.workers = state.workers.filter(worker => worker.id !== action.payload);
+            state.workers = state.workers.filter(worker => worker.id !== action.payload);
             //Filter danh dách sinh viên để dữ lại sinh viên không trùng với action.payload
+            // Cập nhật lại ID của các nhân viên sau khi xóa
+            state.workers = state.workers.map((worker, index) => ({
+                ...worker,
+                id: index + 1
+            }));
+            // Cập nhật lại nextId
+            state.nextId = state.workers.length + 1;
         },
     },
 });

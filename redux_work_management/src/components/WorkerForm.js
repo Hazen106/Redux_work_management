@@ -1,41 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createworker, updateworker } from '../reducer/workerReducers';
-import { useNavigate, useParams } from 'react-router-dom';
+//import { useNavigate, useParams } from 'react-router-dom';
 
-const WorkerForm = () => {
-  const { id } = useParams(); // Lấy id từ URL
+const WorkerForm = ({id, onClose}) => {
+  // const { id } = useParams(); // Lấy id từ URL
   const workers = useSelector((state) => state.workers.workers); //Lấy danh sách sinh viên từ store
-  const worker = workers.find((worker) => worker.id === parseInt(id)); // Tìm sinh viên theo id parseInt
+  //const worker = workers.find((worker) => worker.id === parseInt(id)); // Tìm sinh viên theo id parseInt
+  const worker = workers.find((worker) => worker.id === id);
 
+  const [workercode, setworkercode] = useState(worker ? worker.workercode : '');
   const [workername, setworkername] = useState(worker ? worker.workername : '');
   const [age, setage] = useState(worker ? worker.age : '');
   const [address, setaddress] = useState(worker ? worker.address : '');
   const [ban, setban] = useState(worker ? worker.ban : '');
-  // const [error, setError] = useState('');
+  const [error, setError] = useState(''); // Biến trạng thái để lưu trữ thông báo lỗi
 
   const dispatch = useDispatch(); //useDispath để dispatch các action đến Redux store
-  const navigate = useNavigate(); //useNavigate để điều hướng
+  // const navigate = useNavigate(); //useNavigate để điều hướng
+
+  const handleWorkercodeChange = (e) => {
+    const value = e.target.value;
+    if (value === '' || (Number.isInteger(Number(value)) && Number(value) > 0)) {
+      setworkercode(value);
+    }
+  };
+
+  const handleAgeChange = (e) => {
+    const value = e.target.value;
+    // Chấp nhận cả giá trị trống và số nguyên dương
+    if (value === '' || (Number.isInteger(Number(value)) && Number(value) > 0)) {
+      setage(value);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault(); //Ngăn làm mới trang
-    // if(!ban){
-    //   setError("Vui lòng chọn ban");
-    //   return;
-    // }
+    const duplicateWorker = workers.find((w) => w.workercode === workercode && w.id !== (worker ? worker.id : -1));
+    if (duplicateWorker) {
+      setError('Mã nhân viên không được trùng.');
+      return;
+    }
     if (worker) {
-      dispatch(updateworker({ id: worker.id, workername, age, address, ban }));
+      dispatch(updateworker({ id: worker.id,workercode, workername, age, address, ban }));
       //Nếu có việc thì cập nhật
     } else {
-      const newworker = { workername, age, address, ban };
+      const newworker = { workercode, workername, age, address, ban };
       //Nếu không có tạo việc mới
       dispatch(createworker(newworker));
     }
-    navigate('/'); 
+    // navigate('/'); 
+    onClose();
   };
 
   useEffect(() => {
     if (worker) {
+        setworkercode(worker.workercode);
         setworkername(worker.workername);
         setage(worker.age);
         setaddress(worker.address);
@@ -47,12 +67,17 @@ const WorkerForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
+        <label>Mã nhân viên:</label>
+        <input type="number" value={workercode} onChange={handleWorkercodeChange} step={1} required />
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+      </div>
+      <div>
         <label>Tên nhân viên:</label>
         <input type="text" value={workername} onChange={(e) => setworkername(e.target.value)} required />
       </div>
       <div>
         <label>Tuổi:</label>
-        <input type="number" value={age} onChange={(e) => setage(e.target.value)} required />
+        <input type="number" value={age} onChange={handleAgeChange} step={1} required />
       </div>
       <div>
         <label>Quê quán:</label>
