@@ -21,6 +21,7 @@ const WorkerForm = ({id, onClose}) => {
 
   const handleWorkercodeChange = (e) => {
     const value = e.target.value;
+    //Nhận giá trị rỗng và số nguyên dương
     if (value === '' || (Number.isInteger(Number(value)) && Number(value) > 0)) {
       setworkercode(value);
     }
@@ -36,20 +37,20 @@ const WorkerForm = ({id, onClose}) => {
 
   const handleSubmit = (e) => {
     e.preventDefault(); //Ngăn làm mới trang
+    // Tìm nhân viên có mã nhân viên trùng với mã đang nhập vào và không phải là nhân viên hiện tại đang chỉnh sửa
     const duplicateWorker = workers.find((w) => w.workercode === workercode && w.id !== (worker ? worker.id : -1));
     if (duplicateWorker) {
       setError('Mã nhân viên không được trùng.');
       return;
-    }
+    } //Nếu có trùng báo lỗi
     if (worker) {
       dispatch(updateworker({ id: worker.id,workercode, workername, age, address, ban }));
-      //Nếu có việc thì cập nhật
+      //Nếu có thông tin là nhân viên đang chỉnh sửa thì cập nhật
     } else {
       const newworker = { workercode, workername, age, address, ban };
-      //Nếu không có tạo việc mới
       dispatch(createworker(newworker));
+      //Nếu không thì tạo mới
     }
-    // navigate('/'); 
     onClose();
   };
 
@@ -86,7 +87,7 @@ const WorkerForm = ({id, onClose}) => {
       <div>
         <label>Ban</label>
         <select value={ban} onChange={(e) => setban(e.target.value)} required>
-            <option value="">--- Chọn ban --</option>
+            <option value="">--- Chọn ban ---</option>
             <option value="Công nghệ thông tin">Công nghệ thông tin</option>
             <option value="Đào tạo và PTNL">Đào tạo và PTNL</option>
             <option value="Tài Chính">Tài chính</option>

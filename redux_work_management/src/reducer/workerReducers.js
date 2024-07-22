@@ -29,7 +29,8 @@ const workersSlice = createSlice({
         deleteworker: (state, action) => {
             state.workers = state.workers.filter(worker => worker.id !== action.payload);
             //Filter danh dách sinh viên để dữ lại sinh viên không trùng với action.payload
-            // Cập nhật lại ID của các nhân viên sau khi xóa
+            //Cập nhật lại ID của các nhân viên sau khi xóa bằng map để tạo mảng mới với id được sắp xếp lại
+            //Map duyệt qua từng worker gán lại id theo từng vị trí index+1 trong mảng kết quả là mảng mới từ 1 đến worker.length
             state.workers = state.workers.map((worker, index) => ({
                 ...worker,
                 id: index + 1

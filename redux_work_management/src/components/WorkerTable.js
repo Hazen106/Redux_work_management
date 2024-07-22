@@ -8,55 +8,71 @@ const WorkerTable = ({ workers, onEdit }) => {
   const [newWorker, setNewWorker] = useState({ workercode: '', workername: '', age: '', address: '', ban: '' });
   const [error, setError] = useState('');
   const [EditingWorkerId, setEditingWorkerId] = useState('');
+  
 
   const handleEditChange = (e, workerId, field) => {
     let value = e.target.value;
+    //Kiểm tra có <0 không nếu có thì dừng không cập nhật
     if ((field === 'workercode' || field === 'age') && value < 0) {
       return;
-    } //Kiểm tra có <0 không nếu có thì dừng không cập nhật
+    }
+    //Kiểm tra xem có worker nào có trùng value mà không phải worker đang chỉnh sửa không
     const duplicateWorker = workers.find(worker => worker.workercode === value && worker.id !== workerId);
     if (duplicateWorker) {
       setError('Mã nhân viên không được trùng.');
       return;
-    } //Kiểm tra xem có worker nào có trùng value mà không phải worker đang chỉnh sửa không
+    }
+    //Tạo bản sao của danh sách nhân viên với thông tin cập nhật
     const updatedWorkers = workers.map(worker => {
       if (worker.id === workerId) {
         return { ...worker, [field]: value };
       }
       return worker;
-    }); //tạo bản sao danh sách nhân viên mới với nhân viên vừa cập nhật
-    const updatedWorker = updatedWorkers.find(worker => worker.id === workerId);
+    });
+    const updatedWorker = updatedWorkers.find(worker => worker.id === workerId); //Tìm nhân viên đã được chỉnh sửa
     dispatch(updateworker(updatedWorker)); //dispath hành động cập nhật nhân viên
     setError('');
   };
 
-  const handleNewWorkerChange = (e,workerId, field) => {
+  const handleNewWorkerChange = (e, field) => {
     let value = e.target.value;
-    if ((field === 'workercode' || field === 'age') && value < 0) {
+    // Kiểm tra có <0 không nếu có thì dừng không cập nhật
+    if ((field === 'workercode' || field === 'age') && parseInt(value) < 0) {
       return;
     }
-    const duplicateWorker = workers.find(worker => worker.workercode === value && worker.id !== workerId);
-    if (duplicateWorker) {
-      setError('Mã nhân viên không được trùng.');
-      return;
-    } //Kiểm tra xem có worker nào có trùng value mà không phải worker đang chỉnh sửa không
+    // Nếu thuộc tính là 'workercode', kiểm tra xem có worker nào có cùng workercode hay không
+    if (field === 'workercode') {
+      const duplicateWorker = workers.find(worker => worker.workercode === value);
+      if (duplicateWorker) {
+        setError('Mã nhân viên không được trùng.');
+        return;
+      }
+    }
+    // Cập nhật trạng thái newWorker với giá trị mới của thuộc tính được chỉ định
     setNewWorker({ ...newWorker, [field]: value });
-  }; //Kiểm tra xem có workercode bị trùng hay <0 không nếu có thì dừng lại không thì tạo bản sao dsnv với nhân viên mới
+    // Xóa thông báo lỗi nếu có
+    setError('');
+  };
+  
 
   const handleAddWorker = () => {
+    //Tìm nhân viên có mã vừa nhập
     const duplicateWorker = workers.find(worker => worker.workercode === newWorker.workercode);
+    //Nếu có thì ra thông báo và dừng cập nhật
     if (duplicateWorker) {
       setError('Mã nhân viên không được trùng.');
       return;
-    }// Mã nv mới tạo không được trùng
+    }
+    //Nếu không trùng và các trường đã được điền đầy đủ thì gửi hành động tạo mới nhân viên và cập nhật lại trạng thái
     if (newWorker.workercode && newWorker.workername && newWorker.age && newWorker.address && newWorker.ban) {
       dispatch(createworker(newWorker));
       setNewWorker({ workercode: '', workername: '', age: '', address: '', ban: '' });
       setError('');
-    }//cập nhật nv mới và set rạng thái về ban đầu
+    }
   };
 
   const handleDelete = (id) => {
+    //Hiện cửa sổ thông báo xóa, nếu đồng ý thì gửi hành động xóa nhân viên
     const confirmed = window.confirm('Bạn có chắc chắn muốn xóa không?');
     if (confirmed) {
       dispatch(deleteworker(id));
@@ -65,8 +81,8 @@ const WorkerTable = ({ workers, onEdit }) => {
 
   const handleEditSubmit = (workerId) => {
     setEditingWorkerId(null);
+    
   };
-
   return (
     <table>
       <thead>
